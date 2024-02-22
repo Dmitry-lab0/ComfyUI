@@ -114,19 +114,19 @@ class BaseModel(torch.nn.Module):
 
             noise = kwargs.get("noise", None)
             device = kwargs["device"]
-
-            if concat_latent_image.shape[1:] != noise.shape[1:]:
-                concat_latent_image = utils.common_upscale(concat_latent_image, noise.shape[-1], noise.shape[-2], "bilinear", "center")
-
-            concat_latent_image = utils.resize_to_batch_size(concat_latent_image, noise.shape[0])
-
-            if len(denoise_mask.shape) == len(noise.shape):
-                denoise_mask = denoise_mask[:,:1]
-
-            denoise_mask = denoise_mask.reshape((-1, 1, denoise_mask.shape[-2], denoise_mask.shape[-1]))
-            if denoise_mask.shape[-2:] != noise.shape[-2:]:
-                denoise_mask = utils.common_upscale(denoise_mask, noise.shape[-1], noise.shape[-2], "bilinear", "center")
-            denoise_mask = utils.resize_to_batch_size(denoise_mask.round(), noise.shape[0])
+            if denoise_mask is not None and noise is not None:
+                if concat_latent_image.shape[1:] != noise.shape[1:]:
+                    concat_latent_image = utils.common_upscale(concat_latent_image, noise.shape[-1], noise.shape[-2], "bilinear", "center")
+    
+                concat_latent_image = utils.resize_to_batch_size(concat_latent_image, noise.shape[0])
+    
+                if len(denoise_mask.shape) == len(noise.shape):
+                    denoise_mask = denoise_mask[:,:1]
+    
+                denoise_mask = denoise_mask.reshape((-1, 1, denoise_mask.shape[-2], denoise_mask.shape[-1]))
+                if denoise_mask.shape[-2:] != noise.shape[-2:]:
+                    denoise_mask = utils.common_upscale(denoise_mask, noise.shape[-1], noise.shape[-2], "bilinear", "center")
+                denoise_mask = utils.resize_to_batch_size(denoise_mask.round(), noise.shape[0])
 
             def blank_inpaint_image_like(latent_image):
                 blank_image = torch.ones_like(latent_image)
